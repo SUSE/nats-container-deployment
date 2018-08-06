@@ -1,0 +1,7 @@
+properties:
+  nats:
+    port: 4222
+  fissile:
+    monit:
+      port: 2812
+      user: monit

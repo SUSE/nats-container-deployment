@@ -16,7 +16,6 @@ if [ -z "$DOCKER_ORG" ]; then
 
   fissile build images --force
   fissile build helm --auth-type rbac --defaults-file defaults.txt
-  sed -i 's@image: ".*/fissile-nats:@image: "fissile-nats:@' nats-chart/templates/nats.yaml
 else
   fissile build images --docker-organization $DOCKER_ORG --force
   docker push `fissile show image --docker-organization $DOCKER_ORG`

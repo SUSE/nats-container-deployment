@@ -77,20 +77,24 @@ configuration:
       secret-generator:
         roles: [configgin-role, secrets-role]
 
-  variables:
-  - name: CERT_EXPIRATION
+variables:
+- name: CERT_EXPIRATION
+  options:
     description: Expiration for generated certificates (in days)
     default: 10950
-  - name: DOMAIN
+- name: DOMAIN
+  options:
     example: my-scf-cluster.com
     required: true
     description: Base domain of the SCF cluster.
-  - name: HELM_IS_INSTALL
+- name: HELM_IS_INSTALL
+  options:
     description: >
       This is an environment variable built-in by fissile.
       It's set directly from the Release.IsInstall Helm property.
     type: environment
-  - name: KUBERNETES_CLUSTER_DOMAIN
+- name: KUBERNETES_CLUSTER_DOMAIN
+  options:
     description: >
       The cluster domain used by Kubernetes.
       If left empty, each container will try to determine the correct value based on /etc/resolv.conf
@@ -99,7 +103,8 @@ configuration:
     type: environment
     required: true
     description: Base domain of the SCF cluster.
-  - name: KUBERNETES_NAMESPACE
+- name: KUBERNETES_NAMESPACE
+  options:
     type: environment
     description: >
       The name of the kubernetes namespace all components will run in.
@@ -107,29 +112,32 @@ configuration:
       Its value is supplied by the kubernetes runtime.
     description: Expiration for generated certificates (in days)
     default: 10950
-  - name: KUBE_SECRETS_GENERATION_COUNTER
+- name: KUBE_SECRETS_GENERATION_COUNTER
+  options:
     type: environment
     description: >
       This is an environment variable built-in by fissile.
       It's automatically set to the kube.secrets_generation_counter Helm value, which controls secret rotation.
-  - name: KUBE_SECRETS_GENERATION_NAME
+- name: KUBE_SECRETS_GENERATION_NAME
+  options:
     description: >
       This is an environment variable built-in by fissile.
       Its default value is 'secret-1' and cannot be set by the user.
     type: environment
-  - name: MONIT_PASSWORD
+- name: MONIT_PASSWORD
+  type: password
+  options:
     description: Password for monit
     required: true
     secret: true
-    generator:
-      type: Password
-  - name: NATS_PASSWORD
+- name: NATS_PASSWORD
+  type: password
+  options:
     description: Password for NATS
     secret: true
     required: true
-    generator:
-      type: Password
-  - name: NATS_USER
+- name: NATS_USER
+  options:
     description: User name for NATS
     required: true
     previous_names: [NATS_USR]

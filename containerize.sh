@@ -10,11 +10,17 @@ if [ ! -z "$DOCKER_HOST" ]; then
 fi
 
 [ ! -d "nats-release" ] && git clone --recurse-submodules https://github.com/cloudfoundry/nats-release
+[ ! -d "scf-helper-release" ] && git clone --recurse-submodules https://github.com/SUSE/scf-helper-release
 
-cp -a global-properties nats-release/jobs
 pushd nats-release
-  touch jobs/global-properties/monit
   bosh create-release --force
 popd
+
+pushd scf-helper-release
+  cp $FISSILE_ROLE_MANIFEST ./src
+  bosh create-release --force
+popd
+
+
 docker pull "$FISSILE_STEMCELL"
 fissile build packages

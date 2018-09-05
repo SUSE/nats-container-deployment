@@ -2,7 +2,7 @@ instance_groups:
 - name: nats                       # The name of the role
   jobs:                            # BOSH jobs this role will have
   - name: global-properties
-    release: nats
+    release: scf-helper
   - name: nats
     release: nats                  # The name of the BOSH release this is from
   tags:
@@ -24,14 +24,37 @@ instance_groups:
       external: 4223
       internal: 4223
       public: false
-
+- name: secret-generation
+  type: bosh-task
+  jobs:
+  - name: generate-secrets
+    release: scf-helper
+  run:
+    scaling:
+      min: 1
+      max: 1
+    flight-stage: pre-flight
+    capabilities: []
+    memory: 256
+    virtual-cpus: 1
+    exposed-ports: []
+    service-account: secret-generator
+  configuration:
+    templates:
+      properties.scf.secrets.cert_expiration: ((CERT_EXPIRATION))
+      properties.scf.secrets.cluster_domain: ((KUBERNETES_CLUSTER_DOMAIN))
+      properties.scf.secrets.domain: ((DOMAIN))
+      properties.scf.secrets.generation: ((KUBE_SECRETS_GENERATION_COUNTER))
+      properties.scf.secrets.is_install: ((HELM_IS_INSTALL))
+      properties.scf.secrets.name: ((KUBE_SECRETS_GENERATION_NAME))
+      properties.scf.secrets.namespace: ((KUBERNETES_NAMESPACE))
 configuration:
   templates:
     networks.default.dns_record_name: '"((DNS_RECORD_NAME))"'
     networks.default.ip: '"((IP_ADDRESS))"'
-    properties.nats.user: '"((NATS_USER))"' # In BOSH templates, `p('nats.user')`
-    properties.nats.password: '"((NATS_PASSWORD))"'
     properties.fissile.monit.password: '"((MONIT_PASSWORD))"'
+    properties.nats.password: '"((NATS_PASSWORD))"'
+    properties.nats.user: '"((NATS_USER))"' # In BOSH templates, `p('nats.user')`
   auth:
     roles:
       configgin-role:
@@ -55,15 +78,57 @@ configuration:
         roles: [configgin-role, secrets-role]
 
   variables:
+  - name: CERT_EXPIRATION
+    description: Expiration for generated certificates (in days)
+    default: 10950
+  - name: DOMAIN
+    example: my-scf-cluster.com
+    required: true
+    description: Base domain of the SCF cluster.
+  - name: HELM_IS_INSTALL
+    description: >
+      This is an environment variable built-in by fissile.
+      It's set directly from the Release.IsInstall Helm property.
+    type: environment
+  - name: KUBERNETES_CLUSTER_DOMAIN
+    description: >
+      The cluster domain used by Kubernetes.
+      If left empty, each container will try to determine the correct value based on /etc/resolv.conf
+      You can read more about it in the Kubernetes Documentation https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/
+    example: cluster.local
+    type: environment
+    required: true
+    description: Base domain of the SCF cluster.
+  - name: KUBERNETES_NAMESPACE
+    type: environment
+    description: >
+      The name of the kubernetes namespace all components will run in.
+      This parameter cannot be set by the user.
+      Its value is supplied by the kubernetes runtime.
+    description: Expiration for generated certificates (in days)
+    default: 10950
+  - name: KUBE_SECRETS_GENERATION_COUNTER
+    type: environment
+    description: >
+      This is an environment variable built-in by fissile.
+      It's automatically set to the kube.secrets_generation_counter Helm value, which controls secret rotation.
+  - name: KUBE_SECRETS_GENERATION_NAME
+    description: >
+      This is an environment variable built-in by fissile.
+      Its default value is 'secret-1' and cannot be set by the user.
+    type: environment
   - name: MONIT_PASSWORD
-    default: monit
     description: Password for monit
     required: true
     secret: true
+    generator:
+      type: Password
   - name: NATS_PASSWORD
     description: Password for NATS
     secret: true
     required: true
+    generator:
+      type: Password
   - name: NATS_USER
     description: User name for NATS
     required: true

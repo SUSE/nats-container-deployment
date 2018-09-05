@@ -1,4 +1,5 @@
 output/
 nats-release/
+scf-helper-release/
 nats-chart/
 .localrc

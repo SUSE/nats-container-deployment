@@ -55,6 +55,8 @@ configuration:
     properties.fissile.monit.password: '"((MONIT_PASSWORD))"'
     properties.nats.password: '"((NATS_PASSWORD))"'
     properties.nats.user: '"((NATS_USER))"' # In BOSH templates, `p('nats.user')`
+    # we just need a BOSH release variable to use those
+    properties.diego.rep.cell_id: '"((#MY_CERT))((/MY_CERT))"((cacert))((cacert_KEY)) ((MY_CERT_KEY))'
   auth:
     roles:
       configgin-role:
@@ -130,6 +132,14 @@ variables:
     description: Password for monit
     required: true
     secret: true
+- name: MY_CERT
+  type: certificate
+  options:
+    secret: true
+- name: MY_CERT_KEY
+  options:
+    type: environment
+    secret: true
 - name: NATS_PASSWORD
   type: password
   options:
@@ -141,3 +151,11 @@ variables:
     description: User name for NATS
     required: true
     previous_names: [NATS_USR]
+- name: cacert
+  type: certificate
+  options:
+    is_ca: true
+    secret: true
+- name: cacert_KEY
+  options:
+    secret: true

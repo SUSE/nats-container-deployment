@@ -56,11 +56,11 @@ configuration:
   templates:
     networks.default.dns_record_name: '"((DNS_RECORD_NAME))"'
     networks.default.ip: '"((IP_ADDRESS))"'
+    properties.diego.rep.cell_id: '"((#MY_CERT))((/MY_CERT))"((cacert))((cacert_KEY)) ((MY_CERT_KEY))'
     properties.fissile.monit.password: '"((MONIT_PASSWORD))"'
     properties.nats.password: '"((NATS_PASSWORD))"'
     properties.nats.user: '"((NATS_USER))"' # In BOSH templates, `p('nats.user')`
     # we just need a BOSH release variable to use those
-    properties.diego.rep.cell_id: '"((#MY_CERT))((/MY_CERT))"((cacert))((cacert_KEY)) ((MY_CERT_KEY))'
   auth:
     roles:
       configgin-role:
@@ -139,9 +139,11 @@ variables:
 - name: MY_CERT
   type: certificate
   options:
+    description: A certificate
     secret: true
 - name: MY_CERT_KEY
   options:
+    description: Entry for accessing the key part of MY_CERT
     type: environment
     secret: true
 - name: NATS_PASSWORD
@@ -158,8 +160,10 @@ variables:
 - name: cacert
   type: certificate
   options:
+    description: The default CA for certificates
     is_ca: true
     secret: true
 - name: cacert_KEY
   options:
+    description: Entry for accessing the key part of cacert
     secret: true

@@ -5,40 +5,44 @@ instance_groups:
     release: scf-helper
   - name: nats
     release: nats                  # The name of the BOSH release this is from
+    properties:
+      bosh_containerization:
+        run:                             # Runtime configuration
+          scaling:                       # Auto-scaling limits
+            min: 1
+            max: 3
+          memory: 256                    # Memory request for each instance (MB)
+          virtual-cpus: 4                # CPU request for each instance
+          exposed-ports:
+          - name: nats
+            protocol: TCP                # TCP or UDP
+            external: 4222               # Port visible outside the container
+            internal: 4222               # Port inside the container
+            public: true                 # Whether to expose to outside the cluster
+          - name: nats-routes
+            protocol: TCP
+            external: 4223
+            internal: 4223
+            public: false
   tags:
   - sequential-startup
-  run:                             # Runtime configuration
-    scaling:                       # Auto-scaling limits
-      min: 1
-      max: 3
-    memory: 256                    # Memory request for each instance (MB)
-    virtual-cpus: 4                # CPU request for each instance
-    exposed-ports:
-    - name: nats
-      protocol: TCP                # TCP or UDP
-      external: 4222               # Port visible outside the container
-      internal: 4222               # Port inside the container
-      public: true                 # Whether to expose to outside the cluster
-    - name: nats-routes
-      protocol: TCP
-      external: 4223
-      internal: 4223
-      public: false
 - name: secret-generation
   type: bosh-task
   jobs:
   - name: generate-secrets
     release: scf-helper
-  run:
-    scaling:
-      min: 1
-      max: 1
-    flight-stage: pre-flight
-    capabilities: []
-    memory: 256
-    virtual-cpus: 1
-    exposed-ports: []
-    service-account: secret-generator
+    properties:
+      bosh_containerization:
+        run:
+          scaling:
+            min: 1
+            max: 1
+          flight-stage: pre-flight
+          capabilities: []
+          memory: 256
+          virtual-cpus: 1
+          exposed-ports: []
+          service-account: secret-generator
   configuration:
     templates:
       properties.scf.secrets.cert_expiration: ((CERT_EXPIRATION))
@@ -52,11 +56,11 @@ configuration:
   templates:
     networks.default.dns_record_name: '"((DNS_RECORD_NAME))"'
     networks.default.ip: '"((IP_ADDRESS))"'
+    properties.diego.rep.cell_id: '"((#MY_CERT))((/MY_CERT))"((cacert))((cacert_KEY)) ((MY_CERT_KEY))'
     properties.fissile.monit.password: '"((MONIT_PASSWORD))"'
     properties.nats.password: '"((NATS_PASSWORD))"'
     properties.nats.user: '"((NATS_USER))"' # In BOSH templates, `p('nats.user')`
     # we just need a BOSH release variable to use those
-    properties.diego.rep.cell_id: '"((#MY_CERT))((/MY_CERT))"((cacert))((cacert_KEY)) ((MY_CERT_KEY))'
   auth:
     roles:
       configgin-role:
@@ -135,9 +139,11 @@ variables:
 - name: MY_CERT
   type: certificate
   options:
+    description: A certificate
     secret: true
 - name: MY_CERT_KEY
   options:
+    description: Entry for accessing the key part of MY_CERT
     type: environment
     secret: true
 - name: NATS_PASSWORD
@@ -154,8 +160,10 @@ variables:
 - name: cacert
   type: certificate
   options:
+    description: The default CA for certificates
     is_ca: true
     secret: true
 - name: cacert_KEY
   options:
+    description: Entry for accessing the key part of cacert
     secret: true

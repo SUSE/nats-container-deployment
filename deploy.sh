@@ -18,7 +18,9 @@ if [ -z "$DOCKER_ORG" ]; then
   fissile build helm --auth-type rbac --defaults-file defaults.txt
 else
   fissile build images --docker-organization $DOCKER_ORG --force
-  docker push `fissile show image --docker-organization $DOCKER_ORG`
+  for i in `fissile show image --docker-organization $DOCKER_ORG`; do
+    docker push $i
+  done
   fissile build helm --docker-organization $DOCKER_ORG --auth-type rbac --defaults-file defaults.txt
 fi
 

@@ -11,8 +11,9 @@ fi
 [ -f .localrc ] && source .localrc
 
 if [ -z "$DOCKER_ORG" ]; then
-  # assume minikube
-  eval $(minikube docker-env)
+  if which minikube; then
+    eval $(minikube docker-env)
+  fi
 
   fissile build images --force
   fissile build helm --auth-type rbac --defaults-file defaults.txt

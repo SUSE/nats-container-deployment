@@ -1,4 +1,5 @@
 output/
+bpm-release/
 nats-release/
 scf-helper-release/
 nats-chart/

@@ -9,8 +9,13 @@ if [ ! -z "$DOCKER_HOST" ]; then
   exit 1
 fi
 
+[ ! -d "bpm-release" ] && git clone --recurse-submodules https://github.com/cloudfoundry-incubator/bpm-release
 [ ! -d "nats-release" ] && git clone --recurse-submodules https://github.com/cloudfoundry/nats-release
 [ ! -d "scf-helper-release" ] && git clone --recurse-submodules https://github.com/SUSE/scf-helper-release
+
+pushd bpm-release
+  bosh create-release --force
+popd
 
 pushd nats-release
   bosh create-release --force

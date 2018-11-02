@@ -3,6 +3,8 @@ instance_groups:
   jobs:                            # BOSH jobs this role will have
   - name: global-properties
     release: scf-helper
+  - name: bpm
+    release: bpm
   - name: nats
     release: nats                  # The name of the BOSH release this is from
     properties:

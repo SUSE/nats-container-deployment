@@ -1,4 +1,12 @@
 ---
+bosh:
+  instance_groups:
+  - name: nats
+    jobs:
+    - name: nats
+      properties:
+        nats:
+          port: 4333
 env:
   DOMAIN: bosh.io
 kube:

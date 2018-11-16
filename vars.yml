@@ -15,4 +15,4 @@ kube:
   registry:
     hostname: "docker.io"
 services:
-  loadbalanced: false
+  loadbalanced: true

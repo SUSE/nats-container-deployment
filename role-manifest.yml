@@ -19,13 +19,12 @@ instance_groups:
         ports:
         - name: nats
           protocol: TCP                # TCP or UDP
-          external: 4222               # Port visible outside the container
-          internal: 4222               # Port inside the container
+          external: 4333               # Port visible outside the container
+          internal: 4333               # Port inside the container
           public: true                 # Whether to expose to outside the cluster
         - name: nats-routes
           protocol: TCP
-          external: 4223
-          internal: 4223
+          internal: 4334
           public: false
   tags:
   - sequential-startup

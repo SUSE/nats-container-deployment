@@ -9,9 +9,10 @@ bosh:
           port: 4333
 env:
   DOMAIN: bosh.io
+  NATS_USER: nats
 kube:
   organization: "bosh"
   registry:
     hostname: "docker.io"
 services:
-  loadbalanced: false
+  loadbalanced: true
